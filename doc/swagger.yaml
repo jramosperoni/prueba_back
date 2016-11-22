@@ -1,0 +1,255 @@
+swagger: '2.0'
+info:
+  description: Imatec Sample API - Packing
+  version: 1.0.0
+  title: Imatec Sample API
+  contact:
+    name: Matias Valdes
+    email: mvaldes@imatec.cl
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+host: api.imatec.cl
+basePath: /v1
+tags: []
+schemes:
+  - http
+paths:
+  /products:
+    get:
+      summary: Productos
+      description: Obtener listado de Productos
+      operationId: getProducts
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Producto'
+        '400':
+          description: Status 400
+  '/product/{productId}':
+    get:
+      summary: Producto por Id
+      description: Obtener producto por Id
+      operationId: getProductoById
+      produces:
+        - application/json
+      parameters:
+        - name: productId
+          in: path
+          description: ID de producto
+          required: true
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Success
+          schema:
+            $ref: '#/definitions/Producto'
+        '400':
+          description: Status 400
+        '404':
+          description: Status 404
+  /pallets/findByProducto:
+    get:
+      summary: Obtener Pallets por Producto
+      description: Obtener pallets filtrando por características de producto embalado
+      operationId: findPalletsByProducto
+      produces:
+        - application/json
+      parameters:
+        - name: variedad
+          in: query
+          description: Id de variedad
+          required: true
+          type: integer
+          format: int64
+        - name: status
+          in: query
+          description: Status
+          required: true
+          type: integer
+          format: int64
+        - name: color
+          in: query
+          description: Id de color
+          type: integer
+          format: int64
+        - name: calibre
+          in: query
+          description: Id de calibre
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Pallet'
+        '400':
+          description: Status 400
+definitions:
+  Color:
+    type: object
+    description: Color o tonalidad que puede poseer una variedad de fruta
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+  Calibre:
+    type: object
+    description: Categoría que posee una variedad en relación al tamaño
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+  Especie:
+    type: object
+    description: Especie de fruta
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+  Variedad:
+    type: object
+    description: Categorías dentro de una especie de fruta
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      plu:
+        type: integer
+        format: int64
+        description: Price look-up code
+      especie:
+        $ref: '#/definitions/Especie'
+  Producto:
+    type: object
+    description: Producto a vender o exportar
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      variedad:
+        $ref: '#/definitions/Variedad'
+      color:
+        $ref: '#/definitions/Color'
+      calibre:
+        $ref: '#/definitions/Calibre'
+  Packaging:
+    type: object
+    description: Tipo de embalaje para el producto
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      material:
+        type: string
+        description: Material del embalaje
+  Orchard:
+    type: object
+    description: Huerto o lugar de cultivo
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      csg:
+        type: string
+        description: Identificador internacional del lugar de cultivo
+  Facility:
+    type: object
+    description: Centro de packing o lugar de embalaje
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      csp:
+        type: string
+        description: Identificador internacional del lugar de embalaje
+  ProductPackaging:
+    type: object
+    description: Tipo de producto embalado en packing (combinación de producto y embalaje)
+    properties:
+      id:
+        type: integer
+        format: int64
+      name:
+        type: string
+      product:
+        $ref: '#/definitions/Producto'
+      packaging:
+        $ref: '#/definitions/Packaging'
+      pesoNeto:
+        type: number
+        format: double
+        description: Peso neto (sin embalaje) en Kilogramos
+      pesoBruto:
+        type: number
+        format: double
+        description: Peso bruto (con embalaje) en Kilogramos
+      orchard:
+        $ref: '#/definitions/Orchard'
+  Pallet:
+    type: object
+    description: >-
+      Representa un pallet en packing o bodega formado por un número de
+      productos embalados
+    properties:
+      id:
+        type: integer
+        format: int64
+      productPackagingId:
+        type: integer
+        format: int64
+        description: Id de combinación de producto + embalaje desde packing
+      facilityId:
+        type: integer
+        format: int64
+        description: Id de Facility (Centro de packing)
+      folio:
+        type: string
+        description: Secuencia identificadora
+      completed:
+        type: boolean
+        description: Indica si se ha completado con el total de cajas
+      unidades:
+        type: integer
+        format: int32
+        description: Cantidad de cajas
+      status:
+        type: integer
+        format: int32
+        description: Status
+      fechaEmbalaje:
+        type: string
+        format: date-time
+        description: Fecha y hora de término de embalaje
+      fechaIngreso:
+        type: string
+        format: date-time
+        description: Fecha y hora de ingreso a bodega
+      fechaEgreso:
+        type: string
+        format: date-time
+        description: Fecha y hora de salida de bodega
