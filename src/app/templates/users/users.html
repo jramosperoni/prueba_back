@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<div class="page-header">
+    <h2>Usuarios</h2>
+</div>
+{% if users %}
+<table class="user-table">
+    <tr>
+        <th>id</th>
+        <th>RUT</th>
+        <th>Nombre</th>
+        <th>Habilitado</th>
+        <th>Acciones</th>
+    </tr>
+    {% for user in users %}
+    <tr class="user-row" id="row_{{ user.id }}">
+        <td>{{ user.id }}</td>
+        <td>{{ user.rut }}-{{ user.rutdv }}</td>
+        <td>{{ user.name }}</td>
+        <td>{{ user.is_enabled }}</td>
+        <td> <a href="{{ url_for('.user_edit', id=user.id) }}">editar</a> - <a class="ajax_delete" href="#" data-id="{{ user.id }}" data-delete-url="{{ url_for('.user_delete', id=user.id) }}">eliminar</a> </td>
+    </tr>
+    {% endfor %}
+</table>
+
+<ul class="pager">
+    {% if pagination.has_prev %}
+    <li class="previous"><a href="{{ url_for('.users', page=pagination.prev_num) }}">&larr;</a></li>
+    {% else %}
+    <li class="previous disabled"><a href="#">&larr;</a></li>
+    {% endif %}
+    {% if pagination.has_next %}
+    <li class="next"><a href="{{ url_for('.users', page=pagination.next_num) }}">&rarr;</a></li>
+    {% else %}
+    <li class="next disabled"><a href="#">&rarr;</a></li>
+    {% endif %}
+</ul>
+{% endif %}
+<hr />
+<div>
+    <a href="{{ url_for('.user_edit') }}" class="btn btn-primary" role="button">Crear Usuario</a>
+</div>
+
+
+{% endblock %}

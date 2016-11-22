@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-xs-7 col-xs-offset-2">
+        <table><tr><td>
+            <img height="80px" src="{{ url_for('static', filename='imatec_logo.png') }}">
+        </td></tr></table>
+        <hr />
+            {% for message in get_flashed_messages() %}
+                <div class="alert alert-warning">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            <div class="page-header">
+                <h1>Login</h1>
+            </div>
+            {{ wtf.quick_form(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
