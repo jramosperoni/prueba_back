@@ -17,6 +17,12 @@ class Especie(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
 
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
+
 
 class Variedad(db.Model):
     __tablename__ = 'variedades'
@@ -34,7 +40,8 @@ class Variedad(db.Model):
             'id': self.id,
             'name': self.name,
             'plu': self.plu,
-            'especie_id': self.especie_id,
+            #'especie_id': self.especie_id,
+            'especie': self.especie.serialize()
         }
 
 
@@ -44,11 +51,23 @@ class Color(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
 
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
+
 
 class Calibre(db.Model):
     __tablename__ = 'calibres'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
 
 
 class Product(db.Model):
@@ -61,6 +80,15 @@ class Product(db.Model):
     variedad = db.relationship("Variedad")
     color = db.relationship("Color")
     calibre = db.relationship("Calibre")
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'variedad': self.variedad.serialize(),
+            'color': self.color.serialize(),
+            'calibre': self.calibre.serialize()
+        }
 
 
 class Facility(db.Model):
@@ -136,3 +164,17 @@ class Pallet(db.Model):
         return "{0:03d}{1:02d}{2:05d}".format(int(str(csp)[-3:]),
                                               int(str(year)[-2:]),
                                               int(str(folio)[-5:]))
+
+    def serialize(self):
+        return {
+            'id': self.id,
+            'productPackagingId': self.productpackaging_id,
+            'facilityId': self.facility_id,
+            'folio': self.folio,
+            'completed': self.completed,
+            'unidades': self.unidades,
+            'status': self.status,
+            'fechaEmbalaje': self.fecha_embalaje,
+            'fechaIngreso': self.fecha_ingreso,
+            'fechaEgreso': self.fecha_egreso
+        }
