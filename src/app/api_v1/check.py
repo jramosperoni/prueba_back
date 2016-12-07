@@ -2,7 +2,7 @@ import logging
 import os
 from flask import jsonify, g, request, Response, current_app
 from . import api_bp
-from .errors import unauthorized, bad_request
+from .errors import unauthorized, bad_request, not_found
 from ..models import Variedad
 from ..models import Product
 from ..models import Pallet
@@ -26,7 +26,7 @@ def test_post():
 
 
 @api_bp.route('/variedades')
-def getVariedades():
+def getProducts():
     query = Variedad.query.order_by('id')
     variedades = [v.serialize() for v in query.all()]
     return jsonify({
@@ -36,7 +36,7 @@ def getVariedades():
 
 
 @api_bp.route('/products')
-def getProducts():
+def getProductos():
     try:
         query = Product.query.order_by('id')
         productos = [p.serialize() for p in query.all()]
@@ -50,6 +50,7 @@ def getProducts():
 
 @api_bp.route('/product/<int:productId>')
 def getProductoById(productId):
+    i = int(productId)
     try:
         ProductoId = Product.query.filter(Product.id == productId).first()
         return jsonify({
@@ -60,30 +61,27 @@ def getProductoById(productId):
         return bad_request('Status 400')
 
 
-@api_bp.route('/pallets/findByProducto', methods=['POST'])
+@api_bp.route('/pallets/findByProducto', methods=['GET'])
 def findPalletsByProducto():
-    if request.form is not None:
-        try:
-            variedad = int(request.form.get('variedad'))
-            status = int(request.form.get('status'))
-            color = int(request.form.get('color'))
-            calibre = int(request.form.get('calibre'))
-            query = Pallet.query.join(
-                    ProductPackaging).join(
-                    Product).join(
-                    Variedad).join(
-                    Color).join(
-                    Calibre).filter(
-                    Variedad.id == variedad).filter(
-                    Pallet.status == status).filter(
-                    Color.id == color).filter(
-                    Calibre.id == calibre)
-            pallets = [p.serialize() for p in query.all()]
-        except Exception as e:
-            return bad_request('Status 400')
-        return jsonify({
-            'description': 'Success',
-            'schema': pallets
-        })
-    else:
+    try:
+        variedad = int(request.args.get('variedad'))
+        status = int(request.args.get('status'))
+        color = int(request.args.get('color'))
+        calibre = int(request.args.get('calibre'))
+        query = Pallet.query.join(
+                ProductPackaging).join(
+                Product).join(
+                Variedad).join(
+                Color).join(
+                Calibre).filter(
+                Variedad.id == variedad).filter(
+                Pallet.status == status).filter(
+                Color.id == color).filter(
+                Calibre.id == calibre)
+        pallets = [p.serialize() for p in query.all()]
+    except Exception as e:
         return bad_request('Status 400')
+    return jsonify({
+        'description': 'Success',
+        'schema': pallets
+    })
