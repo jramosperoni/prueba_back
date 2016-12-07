@@ -2,7 +2,7 @@ import logging
 import os
 from flask import jsonify, g, request, Response, current_app
 from . import api_bp
-from .errors import unauthorized, bad_request, not_found
+from .errors import unauthorized, bad_request
 from ..models import Variedad
 from ..models import Product
 from ..models import Pallet
@@ -26,7 +26,7 @@ def test_post():
 
 
 @api_bp.route('/variedades')
-def getProducts():
+def getVariedades():
     query = Variedad.query.order_by('id')
     variedades = [v.serialize() for v in query.all()]
     return jsonify({
@@ -36,7 +36,7 @@ def getProducts():
 
 
 @api_bp.route('/products')
-def getProductos():
+def getProducts():
     try:
         query = Product.query.order_by('id')
         productos = [p.serialize() for p in query.all()]
@@ -50,7 +50,6 @@ def getProductos():
 
 @api_bp.route('/product/<int:productId>')
 def getProductoById(productId):
-    i = int(productId)
     try:
         ProductoId = Product.query.filter(Product.id == productId).first()
         return jsonify({
